@@ -1,40 +1,47 @@
-import smtplib # serve para enviar emails
-from email.mime.text import MIMEText # serve para criar o corpo do email
-import mimetypes # serve para identificar o tipo do arquivo
-from email.message import EmailMessage # serve para criar o email
+import smtplib 
+from email.message import EmailMessage 
+import os
+from dotenv import load_dotenv
+
+load_dotenv() # Carrega as variáveis de ambiente do arquivo .env
 
 remetente = 'thiagomvaz12@gmail.com'
 destinatario = 'charlesvazjus@gmail.com'
 assunto = 'Dashboard de Preços - Contabilizei'
-mensagem_texto = 'Olá, Charles!\n\nSegue em anexo o dashboard de preços atualizado.\n\nAtenciosamente,\nThiago Vaz'
+senha = os.getenv("SENHA_GMAIL") 
 
+mensagem_texto = 'Olá, Charles!\n\nOs preços da concorrência foram atualizados. Acesse o nosso sistema para conferir.'
 
+mensagem_html = """
+<html>
+  <body>
+    <h2>Olá, Charles!</h2>
+    <p>Os preços da concorrência foram atualizados hoje pelo nosso robô.</p>
+    <p>Para ver os gráficos interativos e a tabela de dados, clique no botão abaixo:</p>
+    <br>
+    <a href="https://cwda3ktq7ztmzylswhrycm.streamlit.app" 
+       style="background-color: #008CBA; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-family: Arial; font-weight: bold;">
+       📊 Acessar Dashboard Interativo
+    </a>
+    <br><br>
+    <p><i>Atenciosamente,<br>Thiago Vaz</i></p>
+  </body>
+</html>
+"""
 
+msg = EmailMessage() # aqui criamos o objeto de e-mail, que é onde vamos colocar todas as 
+msg['To'] = destinatario #informações do e-mail, como remetente, destinatário, assunto, texto e HTML. O EmailMessage é uma classe do módulo email que facilita a criação de mensagens de e-mail.
+msg['From'] = remetente  
+msg['Subject'] = assunto
 
-senha ="yhac trmq sxnj gqjo"
-anexo = ""
+msg.set_content(mensagem_texto) #set_content ele passa html para o corpo do e-mail
+msg.add_alternative(mensagem_html, subtype='html')#add_alternative de uma forma simples, ele adiciona uma alternativa ao corpo do e-mail, ou seja, ele permite que o e-mail tenha tanto uma versão em texto quanto uma versão em HTML. O subtype='html' indica que a alternativa é do tipo HTML. Assim, se o cliente de e-mail do destinatário suportar HTML, ele exibirá a versão HTML; caso contrário, ele exibirá a versão em texto simples.
 
-msg = EmailMessage()  # criando o email
-msg ['From'] = remetente 
-msg ['To'] = destinatario
-msg ['Subject'] = assunto
-msg.set_content(mensagem_texto) # set_content é usado para definir o corpo do email
-
-mime_type,_ = mimetypes.guess_type(anexo) # guess_type é usado para identificar o tipo do arquivo
-mime_types , mime_subtype = mime_type.split('/')
-#aqui estou guardando o tipo e o subtipo do arquivo, por exemplo, se for um pdf, o tipo é application e o subtipo é pdf 
-
-with open(anexo, 'rb') as arquivo : # 'rb' é uma leitura binaria para ler o arquivo
-    msg.add_attachment(arquivo.read(), maintype=mime_types, subtype=mime_subtype, filename=anexo) 
-    # add_attachment é usado para adicionar o arquivo ao email, ele recebe o conteúdo do arquivo, o tipo e subtipo do arquivo e o nome do arquivo
-
-
-with smtplib.SMTP_SSL('smtp.gmail.com',465) as email:
-    email.login(remetente, senha) # aqui estou fazendo o login no servidor de email usando remetente e senha
-    email.send_message(msg) # send_message é usado para enviar o email, ele recebe o email criado com o EmailMessage
-   
-   
-   
-    print("Email enviado com sucesso!")
-
-
+print("Conectando ao servidor do Google...")
+try:
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as email: #smtplit.SMTP_SSL é a conexão com server e o smtp.gemail.com 465 é a porta de conexão segura do Gmail, ou seja, ele usa SSL para criptografar a conexão. O with é usado para garantir que a conexão seja fechada corretamente após o envio do e-mail.
+        email.login(remetente, senha) 
+        email.send_message(msg) 
+        print(" E-mail corporativo enviado com sucesso com o botão!")
+except Exception as e:
+    print(f" Erro ao enviar o e-mail: {e}")

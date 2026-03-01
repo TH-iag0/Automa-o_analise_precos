@@ -1,3 +1,5 @@
 .venv/
 __pycache__/
-*.db
+.env
+#biblioteca que sabe ler esse arquivo oculto
+#pip install python-dotenv
