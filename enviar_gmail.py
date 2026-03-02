@@ -10,6 +10,7 @@ destinatario = 'charlesvazjus@gmail.com'
 assunto = 'Dashboard de Preços - Contabilizei'
 senha = os.getenv("SENHA_GMAIL") 
 
+
 mensagem_texto = 'Olá, Charles!\n\nOs preços da concorrência foram atualizados. Acesse o nosso sistema para conferir.'
 
 mensagem_html = """
@@ -21,7 +22,7 @@ mensagem_html = """
     <br>
     <a href="https://cwda3ktq7ztmzylswhrycm.streamlit.app" 
        style="background-color: #008CBA; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-family: Arial; font-weight: bold;">
-       📊 Acessar Dashboard Interativo
+        Acessar Dashboard Interativo
     </a>
     <br><br>
     <p><i>Atenciosamente,<br>Thiago Vaz</i></p>

@@ -14,7 +14,7 @@ def salvar_dados_no_banco(dados_novos):
             )
         ''')
 
-        cursor.executemany('INSERT INTO precos VALUES (?, ?, ?)', dados_novos) 
+        cursor.executemany('INSER   T INTO precos VALUES (?, ?, ?)', dados_novos) 
         # O executemany é usado para inserir vários dados de uma vez, ele recebe o comando sql e a lista de dados_novos, onde cada item da lista é uma tupla com os valores a serem inseridos. O ? é um placeholder que será substituído pelos valores da tupla.
 
         conexao.commit()# commit salva as alterações no banco

@@ -4,48 +4,77 @@ import sqlite3
 
 # Configuração da página para ocupar a tela inteira (wide)
 st.set_page_config(page_title="Dashboard Contabilizei", page_icon="", layout="wide")
+
+# --- BARRA LATERAL (SIDEBAR) ---
+# Tudo que for "st.sidebar" vai ficar no menu lateral esquerdo (igual ao azul da sua imagem)
+with st.sidebar:
+    st.title(" Painel de Controle")
+    st.markdown("Bem-vindo ao sistema de monitoramento.")
+    st.markdown("---")
+    st.markdown("**Status do Robô:** 🟢 Online")
+    st.markdown("**Última atualização:** Hoje")
+    st.markdown("---")
+    st.markdown("*Desenvolvido por Thiago Vaz*")
+
+# --- ÁREA PRINCIPAL ---
 st.title(" Dashboard de Concorrência")
-st.write("Acompanhamento automático dos planos da Contabilizei")
+st.markdown("Acompanhamento automático dos planos da Contabilizei")
 
 try:
     conexao = sqlite3.connect('precos_contabilizei.db')
-
-    # Lê os dados do banco
     df = pd.read_sql_query("SELECT * FROM precos", conexao) 
     conexao.close() 
 
-    # Converte para numérico
     df['preco'] = pd.to_numeric(df['preco'], errors='coerce') 
 
-    # --- CONCEITO 1: CARTÕES MÉTRICOS (Visão Executiva) ---
-    st.markdown("---")
-    st.subheader(" Visão Rápida dos Preços Atuais")
-    
-    # Verifica se o banco de dados não está vazio antes de tentar puxar os preços
     if not df.empty:
-        # Pega o valor exato de cada plano
+        
+        # --- LINHA 1: CARTÕES MÉTRICOS LADO A LADO ---
+        # Igual à parte superior da sua imagem de referência
+        st.subheader(" Visão Rápida dos Preços Atuais")
+        
         preco_padrao = df[df['plano'] == 'Padrão']['preco'].values[0]
         preco_multi = df[df['plano'] == 'Multibenefícios']['preco'].values[0]
         preco_experts = df[df['plano'] == 'Experts Essencial']['preco'].values[0]
 
-        # Divide a tela em 3 colunas para os cartões
+        # 3 colunas para os 3 cartões menores
         col1, col2, col3 = st.columns(3)
-        col1.metric(label="Plano Padrão", value=f"R$ {preco_padrao:.2f}")
-        col2.metric(label="Multibenefícios", value=f"R$ {preco_multi:.2f}")
-        col3.metric(label="Experts Essencial", value=f"R$ {preco_experts:.2f}")
-    
-    st.markdown("---")
+        
+        with col1:
+            with st.container(border=True):
+                st.metric(label="Plano Padrão", value=f"R$ {preco_padrao:.2f}")
+        with col2:
+            with st.container(border=True):
+                st.metric(label="Multibenefícios", value=f"R$ {preco_multi:.2f}")
+        with col3:
+            with st.container(border=True):
+                st.metric(label="Experts Essencial", value=f"R$ {preco_experts:.2f}")
 
-    # --- TABELA DE DADOS ---
-    st.subheader(" Base de Dados Coletados")
-    st.dataframe(df, use_container_width=True)
+        st.markdown("<br>", unsafe_allow_html=True) # Dá um pequeno espaço visual
 
-    # --- GRÁFICOS ---
-    st.subheader(" Comparação Atual de Preços")
-    st.bar_chart(df, x='plano', y='preco', color='plano')
+        # --- LINHA 2: GRÁFICOS GRANDES LADO A LADO ---
+        # Cria duas colunas grandes para os gráficos
+        grafico_esq, grafico_dir = st.columns(2)
+        
+        with grafico_esq:
+            with st.container(border=True):
+                st.subheader(" Comparação Atual")
+                st.bar_chart(df, x='plano', y='preco', color='plano')
 
-    st.subheader(" Evolução Histórica (Linha do Tempo)")
-    st.line_chart(df, x='horario', y='preco', color='plano')
+        with grafico_dir:
+            with st.container(border=True):
+                st.subheader(" Evolução Histórica")
+                st.line_chart(df, x='horario', y='preco', color='plano')
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        # --- LINHA 3: TABELA LARGONA EMBAIXO ---
+        with st.container(border=True):
+            st.subheader(" Base de Dados Coletados")
+            st.dataframe(df, use_container_width=True)
+            
+    else:
+        st.warning("O banco de dados está aguardando os primeiros dados.")
 
 except Exception as e:
     st.error(f"Erro ao carregar dados do banco: {e}")
